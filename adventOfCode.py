@@ -223,3 +223,62 @@ for l in f:
 
 print("Total brightness: {}".format(np.sum(lights)))
 
+# --------------------------------------------
+# Day 7 part 1
+# --------------------------------------------
+providedValues = {}
+mask = 65535
+
+class Gate:
+    def __init__(self, words):
+        if words[0] == 'NOT':
+            self.__operator = words[0]
+            self.__inputs = [words[1]]
+        else:
+            self.__inputs = [words[0]]
+            self.__operator = words[1]
+        if self.__operator == 'AND' or self.__operator == 'OR':
+            self.__inputs.append(words[2])
+        if 'SHIFT' in self.__operator:
+            self.__bits = int(words[2])
+        self.__cached = None
+        self.__output = words[-1]
+
+    def __getValue(self, key):
+        if str.isdigit(key):
+            return int(key)
+        else:
+            return providedValues[key].evaluate()
+
+    def evaluate(self):
+        if self.__cached == None:
+            if self.__operator == 'NOT':
+                self.__cached = ~self.__getValue(self.__inputs[0])
+            elif self.__operator == 'AND':
+                self.__cached = self.__getValue(self.__inputs[0]) & self.__getValue(self.__inputs[1])
+            elif self.__operator == 'OR':
+                self.__cached = self.__getValue(self.__inputs[0]) | self.__getValue(self.__inputs[1])
+            elif self.__operator == 'LSHIFT':
+                self.__cached = self.__getValue(self.__inputs[0]) << self.__bits
+            elif self.__operator == 'RSHIFT':
+                self.__cached = self.__getValue(self.__inputs[0]) >> self.__bits
+            elif self.__operator == '->':
+                self.__cached = self.__getValue(self.__inputs[0])
+
+            if self.__cached == None:
+                print("Result of {} -> {} is None with inputs {}".format(self.__operator, self.__output, self.__inputs.keys()))
+            else:
+                # constrain to 16 bit
+                self.__cached = self.__cached & mask
+        return self.__cached
+
+f = open('day7.txt', 'r')
+for l in f:
+    l = l.strip()
+    words = l.split(' ')
+    providedValues[words[-1]] = Gate(words)
+
+print("Input to a:{}".format(providedValues['a'].evaluate()))
+
+# for part 2: in day7.txt replace the line '14146 -> b' by the new value as input to b
+
