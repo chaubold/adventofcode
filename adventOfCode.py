@@ -324,4 +324,23 @@ print("Best path is {} with distance {}".format(bestPath, bestDist))
 print("worst path is {} with distance {}".format(worstPath, worstDist))
 
 # --------------------------------------------
+# Day 10 part 1 & 2
 # --------------------------------------------
+seq = '1321131112'
+outSeq = ''
+
+for i in range(50): # 40 for the first part
+    print("Iteration {}, sequence has length {}".format(str(i), len(seq)))
+    idx = 0
+    while idx < len(seq):
+        e = seq[idx]
+        occurrances = 0
+        while idx < len(seq) and seq[idx] == e:
+            idx += 1
+            occurrances += 1
+
+        outSeq += str(occurrances) + str(e)
+    seq = outSeq
+    outSeq = ''
+
+print("Resulting sequence has length {}".format(len(seq)))
