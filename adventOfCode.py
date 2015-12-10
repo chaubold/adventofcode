@@ -282,3 +282,46 @@ print("Input to a:{}".format(providedValues['a'].evaluate()))
 
 # for part 2: in day7.txt replace the line '14146 -> b' by the new value as input to b
 
+# --------------------------------------------
+# --------------------------------------------
+# --------------------------------------------
+# Day 9 part 1 & 2
+# --------------------------------------------
+import itertools
+cities = set([])
+distances = {}
+
+f = open('day9.txt', 'r')
+for l in f:
+    l = l.strip()
+    w = l.split('=')
+    d = w[-1]
+    cs = w[0].split(' ')
+    cs = (cs[0], cs[2])
+    cities.add(cs[0])
+    cities.add(cs[1])
+    distances[cs] = int(d)
+    distances[(cs[1], cs[0])] = int(d)
+
+bestPath = None
+bestDist = np.infty
+
+worstPath = None
+worstDist = 0
+
+for i in itertools.permutations(cities):
+    d = 0
+    for idx in range(len(i) - 1):
+        d += distances[(i[idx], i[idx+1])]
+    if d < bestDist:
+        bestDist = d
+        bestPath = i
+    if d > worstDist:
+        worstDist = d
+        worstPath = i
+
+print("Best path is {} with distance {}".format(bestPath, bestDist))
+print("worst path is {} with distance {}".format(worstPath, worstDist))
+
+# --------------------------------------------
+# --------------------------------------------
