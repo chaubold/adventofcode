@@ -289,7 +289,33 @@ print("Input to a:{}".format(providedValues['a'].evaluate()))
 # for part 2: in day7.txt replace the line '14146 -> b' by the new value as input to b
 
 # --------------------------------------------
+# Day 8 part 1
 # --------------------------------------------
+codeLength = 0
+stringLength = 0
+
+f = open('day8.txt', 'r')
+for l in f:
+    l = l.strip()
+    codeLength += len(l)
+    stringLength += len(l.encode('utf-8').decode('unicode_escape')) - 2 # subtract apostrophes
+
+print("The size difference of the representations is {}".format(codeLength - stringLength))
+
+# --------------------------------------------
+# Day 8 part 2
+# --------------------------------------------
+codeLength = 0
+encodedLength = 0
+
+f = open('day8.txt', 'r')
+for l in f:
+    l = l.strip()
+    codeLength += len(l)
+    encodedLength += len(l) + l.count('\\') + l.count('"') + 2
+
+print("The size difference of the representations is {}".format(encodedLength - codeLength))
+
 # --------------------------------------------
 # Day 9 part 1 & 2
 # --------------------------------------------
