@@ -2,7 +2,7 @@
 # Day 1 part 1
 # --------------------------------------------
 parens = '(((())))()((((((( ... '
-parens.count('(') - parens.count(')')
+print("Result is {}".format(parens.count('(') - parens.count(')'))
 
 # --------------------------------------------
 # Day 1 part 2
@@ -17,6 +17,7 @@ for idx, dir in enumerate(parens):
         currentFloor += 1
     else:
         currentFloor -= 1
+print("Santa ends up on floor {}".format(currentFloor))
 
 # --------------------------------------------
 # Day 2 part 1
@@ -32,6 +33,7 @@ def area(line):
 s = 0
 for l in f:
     s += area(l)
+print("They need {} square feet of wrapping paper".format(s))
 
 # --------------------------------------------
 # Day 2 part 2
@@ -47,6 +49,7 @@ def ribbon(line):
 r = 0
 for l in f:
     r += ribbon(l)
+print("They need {} feet of ribbon".format(r))
 
 # --------------------------------------------
 # Day 3 part 1
@@ -75,7 +78,7 @@ for m in moves:
     else:
         deliveries[tuple(current_pos)] = 1
 
-len(deliveries)
+print("Presents were delivered to {} houses".format(len(deliveries)))
 
 # --------------------------------------------
 # Day 3 part 2
@@ -106,6 +109,7 @@ for m in moves:
         deliveries[tuple(current_pos)] = 1
         
 len(deliveries)
+print("Presents were delivered to {} houses".format(len(deliveries)))
 
 # --------------------------------------------
 # Day 4 part 1 and 2
@@ -121,7 +125,7 @@ while True:
     m = hashlib.md5()
     m.update(s)
     h = m.hexdigest()
-    if h[0:6] == '000000':
+    if h[0:6] == '000000': # h[0:5] == '00000' for part 1
         break
     i += 1
 print("Found valid adventcoin: {}".format(i))
@@ -300,25 +304,20 @@ for l in f:
     cs = (cs[0], cs[2])
     cities.add(cs[0])
     cities.add(cs[1])
-    distances[cs] = int(d)
+    distances[cs] = int(d) # store in both directions
     distances[(cs[1], cs[0])] = int(d)
 
-bestPath = None
-bestDist = np.infty
-
-worstPath = None
-worstDist = 0
+bestPath, bestDist = None, np.infty
+worstPath, worstDist = None, 0
 
 for i in itertools.permutations(cities):
     d = 0
     for idx in range(len(i) - 1):
         d += distances[(i[idx], i[idx+1])]
     if d < bestDist:
-        bestDist = d
-        bestPath = i
+        bestDist, bestPath = d, i
     if d > worstDist:
-        worstDist = d
-        worstPath = i
+        worstDist, worstPath = d, i
 
 print("Best path is {} with distance {}".format(bestPath, bestDist))
 print("worst path is {} with distance {}".format(worstPath, worstDist))
