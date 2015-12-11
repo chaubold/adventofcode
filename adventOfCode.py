@@ -344,3 +344,67 @@ for i in range(50): # 40 for the first part
     outSeq = ''
 
 print("Resulting sequence has length {}".format(len(seq)))
+
+# --------------------------------------------
+# Day 11 part 1 & 2
+# --------------------------------------------
+import itertools
+
+def valid(pwd):
+    # exclude i,o,l
+    if pwd.count('i') + pwd.count('o') + pwd.count('l') > 0:
+        return False
+    
+    # find doubles 
+    # WARNING: letters of pairs are required to be different (not 'aatlgaa') but are not yet checked for that!
+    if sum([1 for _,g in itertools.groupby(pwd) if len(list(g)) > 1]) < 2:
+        return False
+
+    # find ascending row of 3
+    good = False
+    for i, c in enumerate(pwd[:-2]):
+        if ord(pwd[i+1]) == ord(c) + 1:
+            if ord(pwd[i+2]) == ord(c) + 2:
+                good = True
+    return good
+
+neg_examples = ['hijklmmn', 'abbceffg', 'abbcegjk']
+pos_examples = ['abcdffaa', 'ghjaabcc']
+
+for s in neg_examples:
+    assert(valid(s) == False)
+for s in pos_examples:
+    assert(valid(s) == True)
+
+def increment(pwd):
+    pwd = list(pwd) # string doesn't allow assignments to positions, so transform to list of char
+    alphabet_start = ord('a')
+    alphabet_end = ord('z')
+
+    carry = 1
+    for idx, c in reversed(list(enumerate(pwd))): # walk backwards along list but remember index into pwd
+        if carry == 0:
+            break
+        ci = ord(c) + 1
+        if ci > alphabet_end:
+            ci = alphabet_start
+            carry = 1
+        else:
+            carry = 0
+        pwd[idx] = chr(ci) # update the character to the new value
+    return ''.join(pwd) # transform back to string
+
+def findNextPwd(old_pwd):
+    new_pwd = increment(old_pwd)
+    while(not valid(new_pwd)):
+        # print(new_pwd, ' is not valid')
+        new_pwd = increment(new_pwd)
+    return new_pwd
+
+assert(findNextPwd('abcdefgh') == pos_examples[0])
+assert(findNextPwd('ghijklmn') == pos_examples[1])
+
+old_pwd = 'hepxcrrq'
+new_pwd = findNextPwd(old_pwd)
+print("Next valid password is ", new_pwd)
+print("Next valid password is ", findNextPwd(new_pwd))
