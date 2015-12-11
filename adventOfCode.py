@@ -1,8 +1,9 @@
 # --------------------------------------------
 # Day 1 part 1
 # --------------------------------------------
-parens = '(((())))()((((((( ... '
-print("Result is {}".format(parens.count('(') - parens.count(')'))
+f = open('day1.txt', 'r')
+parens = f.readline().strip()
+print("Result is {}".format(parens.count('(') - parens.count(')')))
 
 # --------------------------------------------
 # Day 1 part 2
