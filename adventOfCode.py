@@ -55,7 +55,8 @@ print("They need {} feet of ribbon".format(r))
 # --------------------------------------------
 # Day 3 part 1
 # --------------------------------------------
-moves = '>>vv>^v^^^v<>v<>><>^vv^> ....'
+f = open('day3.txt', 'r')
+moves = f.readline().strip()
 current_pos = [0,0]
 deliveries = {}
 
