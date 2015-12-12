@@ -435,3 +435,49 @@ old_pwd = 'hepxcrrq'
 new_pwd = findNextPwd(old_pwd)
 print("Next valid password is ", new_pwd)
 print("Next valid password is ", findNextPwd(new_pwd))
+
+# --------------------------------------------
+# Day 12 part 1
+# --------------------------------------------
+import json
+with open('day12.json', 'r') as f:
+    root = json.load(f)
+
+def parse(node):
+    accumulated = 0
+    if isinstance(node, dict):
+        for v in node.values():
+            accumulated += parse(v)
+    elif isinstance(node, list):
+        for v in node:
+            accumulated += parse(v)
+    elif isinstance(node, int):
+        return node
+
+    return accumulated
+
+print("Overall sum: {}".format(parse(root)))
+
+# --------------------------------------------
+# Day 12 part 2
+# --------------------------------------------
+import json
+with open('day12.json', 'r') as f:
+    root = json.load(f)
+
+def parseNoRed(node):
+    accumulated = 0
+    if isinstance(node, dict):
+        values = list(node.values())
+        if 'red' not in values:
+            for v in node.values():
+                accumulated += parseNoRed(v)
+    elif isinstance(node, list):
+        for v in node:
+            accumulated += parseNoRed(v)
+    elif isinstance(node, int):
+        return node
+
+    return accumulated
+
+print("Overall sum without red: {}".format(parseNoRed(root)))
