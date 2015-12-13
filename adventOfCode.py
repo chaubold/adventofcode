@@ -481,3 +481,54 @@ def parseNoRed(node):
     return accumulated
 
 print("Overall sum without red: {}".format(parseNoRed(root)))
+
+# --------------------------------------------
+# Day 13 part 1
+# --------------------------------------------
+import itertools
+persons = set([])
+happiness = {}
+
+f = open('day13.txt', 'r')
+for l in f:
+    l = l.strip()
+    w = l.split(' ')
+    p1 = w[0]
+    p2 = w[-1][:-1]
+    persons.add(p1)
+    persons.add(p2)
+    h = int(w[3])
+    if w[2] == 'lose':
+        h *= -1
+    happiness[(p1, p2)] = h
+
+def findBestSeating(persons, happiness):
+    bestSeating, bestHappy = None, 0
+
+    for i in itertools.permutations(persons):
+        d = 0
+        for idx in range(len(i) - 1):
+            d += happiness[(i[idx], i[idx+1])]
+            d += happiness[(i[idx+1], i[idx])]
+        d += happiness[(i[-1], i[0])] # add last link to close circle
+        d += happiness[(i[0], i[-1])] # add last link to close circle
+
+        if d > bestHappy:
+            bestHappy, bestSeating = d, i
+    return bestSeating, bestHappy
+
+bestSeating, bestHappy = findBestSeating(persons, happiness)
+
+print("Best path is {} with distance {}".format(bestSeating, bestHappy))
+
+# --------------------------------------------
+# Day 13 part 2
+# --------------------------------------------
+for p in persons:
+    happiness[('me', p)] = 0
+    happiness[(p, 'me')] = 0
+persons.add('me')
+
+bestSeating, bestHappy = findBestSeating(persons, happiness)
+
+print("Best path is {} with distance {}".format(bestSeating, bestHappy))
