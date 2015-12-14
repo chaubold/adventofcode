@@ -532,3 +532,88 @@ persons.add('me')
 bestSeating, bestHappy = findBestSeating(persons, happiness)
 
 print("Best path is {} with distance {}".format(bestSeating, bestHappy))
+
+# --------------------------------------------
+# Day 14 part 1
+# --------------------------------------------
+class Reindeer:
+    def __init__(self, line):
+        line = line.strip()
+        w = line.split()
+        self.name = w[0]
+        self._speed = int(w[3])
+        self._moveTime = int(w[6])
+        self._restTime = int(w[-2])
+        self._timeToStateChange = self._moveTime
+        self._inMovingState = True
+        self.position = 0
+        self.points = 0 # for part 2
+
+    def simulateSecond(self):
+        if self._timeToStateChange == 0:
+            self._inMovingState = not self._inMovingState
+            if self._inMovingState:
+                self._timeToStateChange = self._moveTime
+            else:
+                self._timeToStateChange = self._restTime
+
+        if self._inMovingState:
+            self.position += self._speed
+        self._timeToStateChange -= 1
+
+reindeers = []
+f = open('day14.txt', 'r')
+for l in f:
+    reindeers.append(Reindeer(l))
+
+numSeconds = 2503
+# numSeconds = 1000
+for t in range(0, numSeconds):
+    for r in reindeers:
+        r.simulateSecond()
+
+def findBestReindeer(key=lambda x: x.position):
+    bestDist = 0
+    bestReindeer = None
+    for r in reindeers:
+        if bestDist < key(r):
+            bestDist = key(r)
+            bestReindeer = r
+    return bestReindeer
+
+winner = findBestReindeer()
+print("{} ran the furthest in {} seconds: {} km".format(winner.name, numSeconds, winner.position))
+
+# --------------------------------------------
+# Day 14 part 2
+# --------------------------------------------
+def findBestReindeers():
+    bestDist = 0
+    bestReindeer = []
+    for r in reindeers:
+        if bestDist < r.position:
+            bestDist = r.position
+            bestReindeer = [r]
+        elif bestDist == r.position:
+            bestReindeer.append(r)
+    return bestReindeer
+
+reindeers = []
+f = open('day14.txt', 'r')
+# f = open('day14-example.txt', 'r')
+for l in f:
+    reindeers.append(Reindeer(l))
+
+numSeconds = 2503
+# numSeconds = 1000
+for t in range(0, numSeconds):
+    for r in reindeers:
+        r.simulateSecond()
+        
+    rs = findBestReindeers()
+    for i in rs:
+        i.points += 1
+
+winner = findBestReindeer(key=lambda x: x.points)
+print("{} collected the most points: {}".format(winner.name, winner.points))
+
