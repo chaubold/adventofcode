@@ -609,11 +609,83 @@ numSeconds = 2503
 for t in range(0, numSeconds):
     for r in reindeers:
         r.simulateSecond()
-        
+
     rs = findBestReindeers()
     for i in rs:
         i.points += 1
 
 winner = findBestReindeer(key=lambda x: x.points)
 print("{} collected the most points: {}".format(winner.name, winner.points))
+
+# --------------------------------------------
+# Day 16 part 1
+# --------------------------------------------
+cues = ["children: 3","cats: 7","samoyeds: 2",
+            "pomeranians: 3","akitas: 0","vizslas: 0",
+            "goldfish: 5","trees: 3","cars: 2","perfumes: 1"]
+
+def getAuntAndProps(line):
+    indexOfSeparator = line.find(':')
+    aunt = line[:indexOfSeparator]
+    propList = line[indexOfSeparator+1:]
+    props = map(str.strip, propList.split(','))
+    return aunt, props
+
+# Warning, this is not really the best check, there might be contradictions!
+def numMatches(props):
+    return sum([1 for p in props if p in cues])
+
+best = None
+
+f = open('day16.txt', 'r')
+for l in f:
+    aunt, props = getAuntAndProps(l)
+    matches = numMatches(props)
+    if best is None or matches > best[2]:
+        best = (aunt, props, matches)
+
+print("Best matching aunt is {} with {}".format(best[0], best[1]))
+
+# --------------------------------------------
+# Day 16 part 2
+# --------------------------------------------
+cues = ["children: 3","samoyeds: 2",
+            "akitas: 0","vizslas: 0",
+            "cars: 2","perfumes: 1"]
+
+def getAuntAndProps(line):
+    indexOfSeparator = line.find(':')
+    aunt = line[:indexOfSeparator]
+    propList = line[indexOfSeparator+1:]
+    props = map(str.strip, propList.split(','))
+    return aunt, props
+
+# Warning, this is not really the best check, there might be contradictions!
+def numMatches(props):
+    m = 0
+    for p in props:
+        s, n = p.split(':')
+        if 'cats' in p and int(n) > 7:
+            m += 1
+        elif 'trees' in p and int(n) > 3:
+            m += 1
+        elif 'pomeranians' in p and int(n) < 3:
+            m += 1
+        elif 'goldfish' in p and int(n) < 5:
+            m += 1
+        elif p in cues:
+            m += 1
+
+    return m
+
+best = None
+
+f = open('day16.txt', 'r')
+for l in f:
+    aunt, props = getAuntAndProps(l)
+    matches = numMatches(props)
+    if best is None or matches > best[2]:
+        best = (aunt, props, matches)
+
+print("Best matching aunt is {} with {}".format(best[0], best[1]))
 
