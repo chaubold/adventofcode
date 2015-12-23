@@ -953,7 +953,7 @@ while numPresents(j) < 34000000:
 print("\nThe first house to get 34000000 presents is {}".format(i))
 
 # --------------------------------------------
-# Day 23 part 1
+# Day 23 part 1 and 2
 # --------------------------------------------
 # read instructions
 f = open('day23.txt', 'r')
@@ -962,7 +962,7 @@ for l in f:
     instructions.append(l.strip().split(' '))
 
 # init variables - use lists because they are mutable instead of pure intergers!
-a = [0]
+a = [1] # [0] for part 1
 b = [0]
 instructionPtr = 0
 def getVarByName(name):
@@ -995,6 +995,7 @@ while 0 <= instructionPtr < len(instructions):
     elif i[0] == 'jmp':
         instructionPtr += int(i[1])
         print("Executed jmp {} -> {}".format(i[1], instructionPtr))
+        continue
     elif i[0] == 'jie':
         var = getVarByName(i[1])
         if var[0] % 2 == 0:
