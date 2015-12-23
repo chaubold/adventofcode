@@ -618,6 +618,81 @@ winner = findBestReindeer(key=lambda x: x.points)
 print("{} collected the most points: {}".format(winner.name, winner.points))
 
 # --------------------------------------------
+# Day 15 part 1
+# --------------------------------------------
+class Ingredient:
+    def __init__(self, line):
+        self.name, propertyString = line.split(':')
+        ps = propertyString.split(',')
+        self.properties = {}
+        for p in ps:
+            t = p.strip().split(' ')
+            self.properties[t[0]] = int(t[1])
+
+    def __mul__(self, other):
+        assert(isinstance(other, int))
+        res = {}
+        for p, v in self.properties.iteritems():
+            res[p] = v * other
+        return res
+
+def add(dictA, dictB):
+    if dictB is None:
+        return dictA
+    assert(len(dictA) == len(dictB))
+    res = {}
+    for k,v in dictA.iteritems():
+        assert(k in dictB)
+        res[k] = v + dictB[k]
+    return res
+
+def evaluate(teaspoons, ingredients, calorieLimit=None):
+    s = None
+    for t,i in zip(teaspoons, ingredients):
+        s = add(i*t, s)
+
+    prod = 1
+    for k,v in s.iteritems():
+        if calorieLimit != None and k == 'calories' and v != calorieLimit:
+            return 0
+        if not k == 'calories':
+            prod *= max(0, v)
+    return prod
+
+ingredients = []
+f = open('day15.txt', 'r')
+for l in f:
+    ingredients.append(Ingredient(l.strip()))
+
+best = (None, 0)
+for a in range(1,100):
+    for b in range(1,100):
+        for c in range(1,100):
+            d = 100 - a - b - c 
+            if d < 0: 
+                break
+            teaspoons = [a,b,c,d]
+            e = evaluate(teaspoons, ingredients)
+            if e > best[1]:
+                best = (teaspoons, e)
+
+print("Best combination is {} with value {}".format(best[0], best[1]))
+
+best = (None, 0)
+for a in range(1,100):
+    for b in range(1,100):
+        for c in range(1,100):
+            d = 100 - a - b - c 
+            if d < 0: 
+                break
+            teaspoons = [a,b,c,d]
+            e = evaluate(teaspoons, ingredients, calorieLimit=500)
+            if e > best[1]:
+                best = (teaspoons, e)
+
+print("Best combination with calorieLimit 500 is {} with value {}".format(best[0], best[1]))
+
+# --------------------------------------------
 # Day 16 part 1
 # --------------------------------------------
 cues = ["children: 3","cats: 7","samoyeds: 2",
@@ -688,4 +763,255 @@ for l in f:
         best = (aunt, props, matches)
 
 print("Best matching aunt is {} with {}".format(best[0], best[1]))
+
+# --------------------------------------------
+# Day 17 part 1
+# --------------------------------------------
+import itertools
+# containers = [20, 15, 10, 5, 5]
+# targetCapacity = 25
+
+containers = [43, 3, 4, 10, 21, 44, 4, 6, 47, 41, 34, 17, 17, 44, 36, 31, 46, 9, 27, 38]
+targetCapacity = 150
+
+goodCombinations = 0
+for i in range(1, len(containers)):
+    for c in itertools.combinations(containers, i):
+        if sum(c) == targetCapacity:
+            print(c)
+            goodCombinations += 1
+
+print("Found {} combinations that fit 150".format(goodCombinations))
+
+# --------------------------------------------
+# Day 17 part 2
+# --------------------------------------------
+# counted in logs: 17 ways of combining 4 containers
+
+# --------------------------------------------
+# Day 18 part 1
+# --------------------------------------------
+import numpy as np
+import scipy.signal
+grid = []
+f = open('day18.txt', 'r')
+for l in f:
+    l = l.strip()
+    row = []
+    for i in l:
+        if i == '.':
+            row.append(0)
+        else:
+            row.append(1)
+    grid.append(row)
+
+grid = np.array(grid)
+kernel = np.array([[1,1,1], [1,0,1], [1,1,1]])
+numIterations = 100
+
+for i in range(numIterations):
+    activeNeighbors = scipy.signal.convolve2d(grid, kernel, mode='same')
+    twoActive = activeNeighbors == 2
+    threeActive = activeNeighbors == 3
+    nextGrid = np.zeros_like(grid)
+    nextGrid[grid == 1] = np.logical_or(twoActive, threeActive)[grid == 1].astype(int)
+    nextGrid[grid == 0] = threeActive[grid == 0].astype(int)
+    grid = nextGrid
+
+print("Grid has {} lights switched on".format(np.count_nonzero(grid)))
+
+# --------------------------------------------
+# Day 18 part 2
+# --------------------------------------------
+import numpy as np
+import scipy.signal
+grid = []
+f = open('day18.txt', 'r')
+for l in f:
+    l = l.strip()
+    row = []
+    for i in l:
+        if i == '.':
+            row.append(0)
+        else:
+            row.append(1)
+    grid.append(row)
+
+grid = np.array(grid)
+# enable corners
+grid[0,0] = 1
+grid[0,-1] = 1
+grid[-1,-1] = 1
+grid[-1,0] = 1
+kernel = np.array([[1,1,1], [1,0,1], [1,1,1]])
+numIterations = 100
+
+for i in range(numIterations):
+    activeNeighbors = scipy.signal.convolve2d(grid, kernel, mode='same')
+    twoActive = activeNeighbors == 2
+    threeActive = activeNeighbors == 3
+    nextGrid = np.zeros_like(grid)
+    nextGrid[grid == 1] = np.logical_or(twoActive, threeActive)[grid == 1].astype(int)
+    nextGrid[grid == 0] = threeActive[grid == 0].astype(int)
+    grid = nextGrid
+    # enable corners
+    grid[0,0] = 1
+    grid[0,-1] = 1
+    grid[-1,-1] = 1
+    grid[-1,0] = 1
+
+print("Grid has {} lights switched on".format(np.count_nonzero(grid)))
+
+# --------------------------------------------
+# Day 19 part 1
+# --------------------------------------------
+import re
+
+rules = []
+origin = None
+f = open('day19.txt', 'r')
+foundEmptyLine = False
+for l in f:
+    l = l.strip()
+    # quit after all rules have been read
+    if l == '':
+        foundEmptyLine = True
+    elif foundEmptyLine:
+        origin = l
+    else:
+        r = l.split('=')
+        r[1] = r[1][1:]
+        r = map(str.strip, r)
+        rules.append(r)
+
+results = set([]) # use a set to remove duplicates
+for r in rules:
+    # find all occurrences
+    occurrences = [m.start() for m in re.finditer(r[0], origin)]
+    for o in occurrences:
+        transformed = origin[:o] + r[1] + origin[o+len(r[0]):]
+        results.add(transformed)
+
+print("Found {} different molecules".format(len(results)))
+
+# --------------------------------------------
+# Day 19 part 2
+# --------------------------------------------
+import re
+
+rules = []
+target = None
+f = open('day19.txt', 'r')
+foundEmptyLine = False
+for l in f:
+    l = l.strip()
+    # quit after all rules have been read
+    if l == '':
+        foundEmptyLine = True
+    elif foundEmptyLine:
+        target = l
+    else:
+        r = l.split('=')
+        r[1] = r[1][1:]
+        r = map(str.strip, r)
+        rules.append(r)
+
+results = set(['e']) # use a set to remove duplicates
+nextResults = set([])
+steps = 0
+while target not in results:
+    for w in results:
+        for r in rules:
+            # find all occurrences
+            occurrences = [m.start() for m in re.finditer(r[0], w)]
+            for o in occurrences:
+                transformed = w[:o] + r[1] + w[o+len(r[0]):]
+                nextResults.add(transformed)
+    results = set(nextResults)
+    nextResults = set([])
+    steps += 1
+
+print("Needed {} steps to get to medicine".format(steps))
+
+# --------------------------------------------
+# Day 20 part 1
+# --------------------------------------------
+import sys
+def numPresents(n):
+    p = 0
+    for i in xrange(1, n+1):
+        if n % i == 0:
+            p += 10 * i
+    return p
+
+j = 1000000 # found by simple trying
+while numPresents(j) < 34000000:
+    j += 1 
+    if j % 1000 == 0:
+        print('{}'.format(j))
+
+print("\nThe first house to get 34000000 presents is {}".format(i))
+
+# --------------------------------------------
+# Day 23 part 1
+# --------------------------------------------
+# read instructions
+f = open('day23.txt', 'r')
+instructions = []
+for l in f:
+    instructions.append(l.strip().split(' '))
+
+# init variables - use lists because they are mutable instead of pure intergers!
+a = [0]
+b = [0]
+instructionPtr = 0
+def getVarByName(name):
+    # we only compare the first char, to ignore the trailing comma in jumps
+    if name[0] == 'a':
+        return a
+    elif name[0] == 'b':
+        return b
+    else:
+        raise ArgumentException
+
+# process
+while 0 <= instructionPtr < len(instructions):
+    print("InstructionPtr: {}".format(instructionPtr))
+    i = instructions[instructionPtr]
+    print("\tInstruction: {}".format(i))
+
+    if i[0] == 'hlf':
+        var = getVarByName(i[1])
+        var[0] /= 2
+        print("Executed hlf {} -> {}".format(i[1], var[0]))
+    elif i[0] == 'tpl':
+        var = getVarByName(i[1])
+        var[0] *= 3
+        print("Executed tpl {} -> {}".format(i[1], var[0]))
+    elif i[0] == 'inc':
+        var = getVarByName(i[1])
+        var[0] += 1
+        print("Executed inc {} -> {}".format(i[1], var[0]))
+    elif i[0] == 'jmp':
+        instructionPtr += int(i[1])
+        print("Executed jmp {} -> {}".format(i[1], instructionPtr))
+    elif i[0] == 'jie':
+        var = getVarByName(i[1])
+        if var[0] % 2 == 0:
+            instructionPtr += int(i[2])
+            print("Executed jie {}(={}) {} -> {}".format(i[1], var[0], i[2], instructionPtr))
+            continue
+    elif i[0] == 'jio':
+        var = getVarByName(i[1])
+        if var[0] == 1:
+            instructionPtr += int(i[2])
+            print("Executed jio {}(={}) {} -> {}".format(i[1], var[0], i[2], instructionPtr))
+            continue
+
+    instructionPtr += 1
+
+# output values
+print("Variables have values a={}, b={}".format(a,b))
+
+
 
