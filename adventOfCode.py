@@ -944,13 +944,116 @@ def numPresents(n):
             p += 10 * i
     return p
 
-j = 1000000 # found by simple trying
+j = 100000
 while numPresents(j) < 34000000:
-    j += 1 
     if j % 1000 == 0:
         print('{}'.format(j))
+    j += 1
 
-print("\nThe first house to get 34000000 presents is {}".format(i))
+print("\nThe first house to get 34000000 presents is {}".format(j))
+
+
+# --------------------------------------------
+# Day 20 part 2
+# --------------------------------------------
+import sys
+def numPresents2(n):
+    p = 0
+    for i in xrange(1, n+1):
+        if n % i == 0 and n <= i * 50:
+            p += 11 * i
+    return p
+
+j = 786240
+while numPresents2(j) < 34000000:
+    if j % 1000 == 0:
+        print('{}'.format(j))
+    j += 1
+
+print("\nThe first house to get 34000000 presents is {}".format(j))
+
+# --------------------------------------------
+# Day 21 part 1
+# --------------------------------------------
+weapons = 'Dagger        8     4       0 \n \
+Shortsword   10     5       0 \n \
+Warhammer    25     6       0 \n \
+Longsword    40     7       0 \n \
+Greataxe     74     8       0'
+​
+armor = 'Leather      13     0       1 \n \
+Chainmail    31     0       2 \n \
+Splintmail   53     0       3 \n \
+Bandedmail   75     0       4 \n \
+Platemail   102     0       5'
+​
+rings = 'Damage +1    25     1       0 \n \
+Damage +2    50     2       0 \n \
+Damage +3   100     3       0 \n \
+Defense +1   20     0       1 \n \
+Defense +2   40     0       2 \n \
+Defense +3   80     0       3'
+
+def extractFromShop(strings):
+    s = strings.split('\n')
+    items = []
+    for l in s:
+        items.append(tuple(l.split()))
+    return items
+
+weapons = extractFromShop(weapons)
+armor = extractFromShop(armor)
+rings = extractFromShop(rings)
+
+# append placeholders for not using any armor / not using any ring
+armor.append(('None', '0', '0', '0'))
+rings.append(('None', '0', '0', '0', '0'))
+rings.append(('None', '0', '0', '0', '0'))
+
+playerHP = 100
+bossHP = 103
+bossArmor = 2
+bossDamage = 9
+
+def doIwin(weapon, armor, rings):
+    playerDamage = int(weapon[2])
+    playerArmor = int(armor[3])
+    for r in rings:
+        playerDamage += int(r[3])
+        playerArmor += int(r[4])
+    roundsUntilPlayerDies = (playerHP-1) / max(1, bossDamage-playerArmor)
+    roundsUntilBossDies = (bossHP-1) / max(1, playerDamage-bossArmor)
+    return roundsUntilBossDies < roundsUntilPlayerDies+1
+
+import itertools
+bestPrice = 9999999
+best = None
+for w in weapons:
+    for a in armor:
+        for r1,r2 in itertools.combinations(rings, 2):
+            price = int(w[1]) + int(a[1]) + int(r1[2]) + int(r2[2])
+            if doIwin(w,a,[r1,r2]) and price < bestPrice:
+                bestPrice = price
+                best = (w,a,r1,r2)
+
+print("Best price while still winning: {} with a combination of {}".format(bestPrice, best))
+
+# --------------------------------------------
+# Day 21 part 2
+# --------------------------------------------
+
+import itertools
+bestPrice = 0
+best = None
+for w in weapons:
+    for a in armor:
+        for r1,r2 in itertools.combinations(rings, 2):
+            price = int(w[1]) + int(a[1]) + int(r1[2]) + int(r2[2])
+            if not doIwin(w,a,[r1,r2]) and price > bestPrice:
+                bestPrice = price
+                best = (w,a,r1,r2)
+
+print("Worst price while still winning: {} with a combination of {}".format(bestPrice, best))
 
 # --------------------------------------------
 # Day 23 part 1 and 2
@@ -1014,5 +1117,58 @@ while 0 <= instructionPtr < len(instructions):
 # output values
 print("Variables have values a={}, b={}".format(a,b))
 
+# --------------------------------------------
+# Day 24 part 1
+# --------------------------------------------
+boxes = [1,3,5,11,13,17,19,23,29,31,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113]
+totalWeight = sum(boxes)
 
+import itertools
+​
+def weight(group):
+    return sum(group)
+​
+def findValidGroups(): 
+    for i in range(1,len(boxes)):
+        for groupA in itertools.combinations(boxes, i):
+            if 3*weight(groupA) != totalWeight:
+                continue
+            rest = [b for b in boxes if b not in groupA]
+            for j in range(1,len(rest)):
+                for groupB in itertools.combinations(rest, j):
+                    if 3*weight(groupB) == totalWeight:
+                        groupC = [b for b in rest if b not in groupB]
+                        return (groupA, groupB, groupC)
+a,b,c = findValidGroups()
 
+def quantumCoupling(group):
+    return reduce(lambda x,y:x*y, group)
+
+print(quantumCoupling(a))
+
+# --------------------------------------------
+# Day 24 part 2
+# --------------------------------------------
+import itertools
+​
+def weight(group):
+    return sum(group)
+​
+def findValidGroups():
+    for i in range(1,len(boxes)):
+        for groupA in itertools.combinations(boxes, i):
+            if 4*weight(groupA) != totalWeight:
+                continue
+            rest = [b for b in boxes if b not in groupA]
+            for j in range(1,len(rest)):
+                for groupB in itertools.combinations(rest, j):
+                    if 4*weight(groupB) == totalWeight:
+                        rest2 = [b for b in rest if b not in groupB]
+                        for k in range(1,len(rest2)):
+                            for groupC in itertools.combinations(rest2, k):
+                                if 4*weight(groupC) == totalWeight:
+                                    r = [b for b in rest if b not in groupB]
+                                    return (groupA, groupB, groupC)
+a,b,c = findValidGroups()
+
+print(quantumCoupling(a))
