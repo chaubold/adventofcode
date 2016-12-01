@@ -916,19 +916,19 @@ for l in f:
         r = map(str.strip, r)
         rules.append(r)
 
-results = set(['e']) # use a set to remove duplicates
-nextResults = set([])
+possiblePredecessors = set([target]) # use a set to remove duplicates
 steps = 0
-while target not in results:
-    for w in results:
+while 'e' not in possiblePredecessors:
+    nextLevelPredecessors = set([])
+    for w in possiblePredecessors:
         for r in rules:
             # find all occurrences
-            occurrences = [m.start() for m in re.finditer(r[0], w)]
+            occurrences = [m.start() for m in re.finditer(r[1], w)]
             for o in occurrences:
-                transformed = w[:o] + r[1] + w[o+len(r[0]):]
-                nextResults.add(transformed)
-    results = set(nextResults)
-    nextResults = set([])
+                transformed = w[:o] + r[0] + w[o+len(r[1]):]
+                nextLevelPredecessors.add(transformed)
+    possiblePredecessors = set(nextLevelPredecessors)
+    print(possiblePredecessors)
     steps += 1
 
 print("Needed {} steps to get to medicine".format(steps))
