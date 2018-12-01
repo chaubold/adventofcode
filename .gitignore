@@ -1,3 +1,5 @@
 .tags*
 .vscode/*
 **/node_modules/**
+**/*.js.map
+**/*.js
