@@ -87,3 +87,59 @@ fn main() {
     println!("Num Valid Passwords Part 2: {}", num_valid_passwords_part2);
     println!("Done.")
 }
+
+// Tests
+
+#[test]
+fn rule1() {
+    let line = "1-3 a: abcde";
+
+    let parts = line.split(":").collect::<Vec<_>>();
+    assert_eq!(parts.len(), 2);
+
+    match Rule::from_str(parts[0]) {
+        Ok(rule) => {
+            let pw = parts[1];
+
+            assert!(rule.is_password_valid(pw));
+            assert!(rule.is_password_valid_part2(pw));
+        }
+        Err(_) => panic!("Did not understand line: {}", line)
+    }
+}
+
+#[test]
+fn rule2() {
+    let line = "1-3 b: cdefg";
+    
+    let parts = line.split(":").collect::<Vec<_>>();
+    assert_eq!(parts.len(), 2);
+
+    match Rule::from_str(parts[0]) {
+        Ok(rule) => {
+            let pw = parts[1];
+
+            assert!(!rule.is_password_valid(pw));
+            assert!(!rule.is_password_valid_part2(pw));
+        }
+        Err(_) => panic!("Did not understand line: {}", line)
+    }
+}
+
+#[test]
+fn rule3() {
+    let line = "2-9 c: ccccccccc";
+    
+    let parts = line.split(":").collect::<Vec<_>>();
+    assert_eq!(parts.len(), 2);
+
+    match Rule::from_str(parts[0]) {
+        Ok(rule) => {
+            let pw = parts[1];
+
+            assert!(rule.is_password_valid(pw));
+            assert!(!rule.is_password_valid_part2(pw));
+        }
+        Err(_) => panic!("Did not understand line: {}", line)
+    }
+}
